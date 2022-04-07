@@ -4,9 +4,9 @@
 module Metai.Token where
 
 import Data.Function (on)
+import Data.Void (Void)
 import Data.List (intersect)
 import qualified Data.Text as Text
-import Metai.Extra (Parser)
 import Text.Megaparsec
 import Text.Megaparsec.Char (char, string)
 
@@ -37,7 +37,7 @@ data Voice = Voiced | Unvoiced
 instance Ord SonorityClass where
     compare =
         compare `on` \case
-            Plosive _ -> 1
+            Plosive _ -> 1 :: Int
             Affricate _ -> 2
             Fricative Unvoiced -> 2
             Fricative Voiced -> 3
@@ -75,7 +75,7 @@ hasDiacritics diacritics = \case
 tokenize :: Text.Text -> Maybe [TextToken]
 tokenize = parseMaybe (textToken `someTill` eof)
 
-textToken :: Parser TextToken
+textToken :: Parsec Void Text.Text TextToken
 textToken =
     foldr1
         (<|>)

@@ -1,10 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Metai.Syllable (Syllable (segments), syllables, weightPattern, stressPattern, renderPattern) where
+module Metai.Syllable (Syllable (segments), syllabify, weightPattern, stressPattern, renderPattern, onset, rhyme, nucleus, coda) where
 
 import Data.List.Split (splitOn)
 import Data.Maybe (isNothing, mapMaybe)
-import qualified Data.Text as Text
 import Metai.Token (Diacritic (..), TextToken (..), hasDiacritics, isVowel, tokenIsVowel)
 
 -------------------------------------------------------------------------------
@@ -24,8 +23,8 @@ coda = dropWhile tokenIsVowel . rhyme
 -- Syllabification algorithm
 -------------------------------------------------------------------------------
 
-syllables :: [TextToken] -> [Syllable]
-syllables = killNonInitialExtrasyllabic . killInitialExtrasyllabic . maximizeOnset
+syllabify :: [TextToken] -> [Syllable]
+syllabify = killNonInitialExtrasyllabic . killInitialExtrasyllabic . maximizeOnset
 
 killInitialExtrasyllabic :: [Syllable] -> [Syllable]
 killInitialExtrasyllabic = \case

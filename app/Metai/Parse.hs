@@ -3,26 +3,19 @@
 module Metai.Parse where
 
 import qualified Data.Text as Text
-import qualified Data.Text.IO as Text
 import qualified Data.Text.Normalize as Text
-import Metai.Extra (Parser)
+import Metai.Extra (debug)
 import Numeric.Natural (Natural)
-import Text.Megaparsec
-import Text.Megaparsec.Char (char, eol, space)
-import Text.Megaparsec.Char.Lexer (decimal)
+import Data.Csv
+import qualified Data.Vector as Vector
+import qualified Data.ByteString.Lazy as ByteString
 
-data Line a = Line { lineBook :: Natural, lineVerse :: Natural, lineText :: a }
+
+data Line = Line { lineBook :: Natural, lineVerse :: Natural, lineText :: Text.Text }
   deriving (Show)
 
-parseLines :: Text.Text -> Maybe [Line Text.Text]
-parseLines = parseMaybe (many line)
-  where
-    line :: Parser (Line Text.Text)
-    line =
-        Line
-            <$> (decimal <* char '.')
-            <*> (decimal <* space)
-            <*> ((normalize <$> Text.pack <$> (anySingle `someTill` eol)))
+instance FromNamedRecord Line where
+  parseNamedRecord l = Line <$> (l .: "Book") <*> (l .: "Line") <*> (normalize <$> l .: "Text")
 
 normalize :: Text.Text -> Text.Text
 normalize =
@@ -42,11 +35,14 @@ normalize =
         . Text.replace "'" ""
         . Text.replace "]" ""
         . Text.replace "[" ""
-        . Text.replace "\"" ""
         . Text.normalize Text.NFD
         . Text.toLower
 
-metaiLines :: IO [Line Text.Text]
-metaiLines =
-    maybe (error "lines did not parse") return
-        =<< parseLines <$> Text.readFile "metai.txt"
+metaiLines :: IO [Line]
+metaiLines = do
+    csvData <- ByteString.readFile "metai.csv"
+    case decodeByName csvData :: Either String (Header, Vector.Vector Line) of
+        Left err -> error err
+        Right (_header, v) ->
+          let _ = debug "header" _header `seq` ()
+           in return $ Vector.toList v

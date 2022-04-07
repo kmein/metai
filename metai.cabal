@@ -1,9 +1,9 @@
 cabal-version:      2.4
 name:               metai
-version:            0.1.0.0
+version:            0.1.0
 author:             Kierán Meinhardt
 maintainer:         kmein@posteo.de
-extra-source-files: metai.txt
+extra-source-files: metai.csv
 
 executable metai
     main-is:          Main.hs
@@ -12,11 +12,13 @@ executable metai
                     , unicode-transforms
                     , text
                     , split
+                    , cassava
+                    , bytestring
                     , vector
-                    , statistics
     other-modules:    Metai.Extra
                     , Metai.Parse
                     , Metai.Token
                     , Metai.Syllable
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options:      -O2 -Wall -threaded
