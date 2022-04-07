@@ -12,6 +12,7 @@ import Metai.Token (Diacritic (..), TextToken (..), hasDiacritics, isVowel, toke
 -------------------------------------------------------------------------------
 
 newtype Syllable = Syllable {segments :: [TextToken]}
+  deriving (Show)
 
 onset, rhyme, nucleus, coda :: Syllable -> [TextToken]
 onset = takeWhile (not . tokenIsVowel) . segments

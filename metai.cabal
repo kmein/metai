@@ -12,6 +12,8 @@ executable metai
                     , unicode-transforms
                     , text
                     , split
+                    , vector
+                    , statistics
     other-modules:    Metai.Extra
                     , Metai.Parse
                     , Metai.Token
