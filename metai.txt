@@ -2944,7 +2944,7 @@
 4.658 Nėsă dăr ìlgs păżįgýs, ı̆kı̆ wėl wăsărėlĕ̜ sŭláuksim,
 4.659 Ìr szwëżiùs walgiùs į půdus kráudămı̆ wìrsim.
 4.660 Nùgı̆ dăbàr wėl skìrkı̆mės ìr sŭ pădėjı̆mŭ Dëwo
-4.661 Skùbį̆kı̆mės săwŏ pádăry̆nws pămăżì păsı̆prówyt;
+4.661 Skùbį̆kı̆mės săwŏ pádăry̆nes pămăżì păsı̆prówyt;
 4.662 Nės salélė wėl pusnýnus pràdĕdă gàndįt,
 4.663 Ìr jau wėwersei linksmaý lakstýdămı̆ czýpsi.
 4.664 Weì, wăsărėlė jaù pămăżì prı̆sı̆ártı̆nă mëla,
