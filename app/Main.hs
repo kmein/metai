@@ -6,23 +6,30 @@ module Main where
 
 import qualified Data.ByteString.Lazy as ByteString
 import Data.Csv
-import Data.Maybe (fromJust)
+import Data.List (intercalate)
 import qualified Data.Text as Text
+import Metai.Hexameter (Foot (..), analyse)
 import Metai.Parse (Line (..), metaiLines)
-import Metai.Syllable (Syllable, renderPattern, syllabify)
+import Metai.Syllable (syllabify)
 import Metai.Token (tokenize)
-
-evaluate :: ([Syllable] -> [Maybe Bool]) -> Line -> [String]
-evaluate pattern =
-    map (renderPattern . pattern . syllabify . fromJust . tokenize) . Text.words . lineText
 
 main :: IO ()
 main = do
-    let countSyllables :: Line -> Int
-        countSyllables = length . concatMap (syllabify . fromJust . tokenize) . Text.words . lineText
+    let renderFoot = \case
+            Dactyl -> 'D'
+            Spondee -> 'S'
     allLines <- metaiLines
-    let syllableCounts = fmap countSyllables allLines
     ByteString.putStr $
         encode $
-            map (\(syllables, Line{..}) -> (lineBook, lineVerse, lineText, syllables)) $
-                zip syllableCounts allLines
+            map
+                ( \line@Line{..} ->
+                    ( lineBook
+                    , lineVerse
+                    , lineText
+                    , length . concatMap (syllabify . tokenize) $ Text.words lineText
+                    , case analyse line of
+                        Just xs -> intercalate "|" (map (map renderFoot) xs)
+                        Nothing -> "invalid"
+                    )
+                )
+                allLines

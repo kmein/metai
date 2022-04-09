@@ -35,6 +35,8 @@ normalize =
         . Text.replace "'" ""
         . Text.replace "]" ""
         . Text.replace "[" ""
+        . Text.replace " -" "-"
+        . Text.replace " /" "/"
         . Text.normalize Text.NFD
         . Text.toLower
 

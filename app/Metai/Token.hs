@@ -5,6 +5,7 @@ module Metai.Token where
 
 import Data.Function (on)
 import Data.Void (Void)
+import Data.Maybe (fromJust)
 import Data.List (intersect)
 import qualified Data.Text as Text
 import Text.Megaparsec
@@ -72,8 +73,8 @@ hasDiacritics diacritics = \case
 -- Tokenization
 --------------------------------------------------------------------------------
 
-tokenize :: Text.Text -> Maybe [TextToken]
-tokenize = parseMaybe (textToken `someTill` eof)
+tokenize :: Text.Text -> [TextToken]
+tokenize = fromJust . parseMaybe (textToken `someTill` eof)
 
 textToken :: Parsec Void Text.Text TextToken
 textToken =

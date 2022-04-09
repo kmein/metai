@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Metai.Syllable (Syllable (segments), syllabify, weightPattern, stressPattern, renderPattern, onset, rhyme, nucleus, coda) where
+module Metai.Syllable (Syllable, syllabify, segments, onset, rhyme, nucleus, coda) where
 
 import Data.List.Split (splitOn)
 import Data.Maybe (isNothing, mapMaybe)
@@ -10,10 +10,13 @@ import Metai.Token (Diacritic (..), TextToken (..), hasDiacritics, isVowel, toke
 -- Syllable definition + helper functions
 -------------------------------------------------------------------------------
 
-newtype Syllable = Syllable {segments :: [TextToken]}
+newtype Syllable = Syllable {getSyllable :: [TextToken]}
   deriving (Show)
 
-onset, rhyme, nucleus, coda :: Syllable -> [TextToken]
+segments, onset, rhyme, nucleus, coda :: Syllable -> [TextToken]
+segments = filter (\case
+  Sound _ _ -> True
+  _ -> False) . getSyllable
 onset = takeWhile (not . tokenIsVowel) . segments
 rhyme = dropWhile (not . tokenIsVowel) . segments
 nucleus = takeWhile tokenIsVowel . rhyme
@@ -61,45 +64,3 @@ isExtrasyllabic syllable = case classes $ segments syllable of
     classes = mapMaybe $ \case
         Sound theClass _ -> Just theClass
         _ -> Nothing
-
--------------------------------------------------------------------------------
--- Syllable weight and word stress patterns
--------------------------------------------------------------------------------
-
-weightPattern :: [Syllable] -> [Maybe Bool]
-weightPattern = map deriveWeight
-  where
-    deriveWeight syllable
-        | any (hasDiacritics [Dot, Acute, Circumflex, Ogonek]) (segments syllable) = Just True
-        | length (rhyme syllable) > 1 = Just True
-        | otherwise = Just False
-
-stressPattern :: [Syllable] -> [Maybe Bool]
-stressPattern =
-    disambiguateStresses
-        . map deriveStress
-  where
-    deriveStress (Syllable syllableSounds)
-        | any (hasDiacritics [Grave, Acute, Circumflex]) syllableSounds = Just True
-        | any (hasDiacritics [Breve]) syllableSounds = Just False
-        | otherwise = Nothing
-    disambiguateStresses stresses =
-        map
-            ( \stress ->
-                if isNothing stress
-                    then
-                        if any (== Just True) stresses
-                            then Just False
-                            else
-                                if length (filter isNothing stresses) == 1 -- are we the only undecided syllable
-                                    then Just True
-                                    else stress
-                    else stress
-            )
-            stresses
-
-renderPattern :: [Maybe Bool] -> String
-renderPattern = map $ \case
-    Just False -> '-'
-    Just True -> '+'
-    Nothing -> '?'
