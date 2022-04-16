@@ -2,14 +2,11 @@
 
 module Metai.Hexameter where
 
-import Control.Applicative (liftA2)
-import Data.Function (on)
-import Data.List (genericLength, groupBy, intercalate, nub, permutations, sortOn)
-import Data.Maybe (isNothing, listToMaybe)
+import Data.List (genericLength, intercalate, nub, permutations)
 import qualified Data.Text as Text
 import Metai.Extra (debug, groupOn, minimumOn)
 import Metai.Parse (Line (..))
-import Metai.Syllable (Syllable, nucleus, rhyme, segments, syllabify)
+import Metai.Syllable (Syllable, nucleus, rhyme, syllabify)
 import Metai.Token (Diacritic (..), hasDiacritics, tokenize)
 import Numeric.Natural (Natural)
 
@@ -25,6 +22,7 @@ instance Show Length where
 data Foot = Dactyl | Spondee
     deriving (Eq)
 
+footToPattern :: Foot -> [Length]
 footToPattern = \case
     Dactyl -> [Long, Short, Short]
     Spondee -> [Long, Unknown]
