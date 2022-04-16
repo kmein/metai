@@ -111,22 +111,14 @@ score x y = sum (zipWith scoreOne x y)
     scoreOne _ _ = 0
 
 possibleHexameterShapes :: Natural -> [[Foot]]
-possibleHexameterShapes = \case
-    17 -> generateShapes 5 1
-    16 -> generateShapes 4 2
-    15 -> generateShapes 3 3
-    14 -> generateShapes 2 4
-    13 -> generateShapes 1 5
-    12 -> generateShapes 0 6
-    _ -> []
+possibleHexameterShapes syllables
+    | nDactyls + nSpondees == 6 =
+        map ((++ [Spondee])) $
+            nub $
+                permutations $
+                    replicate nDactyls Dactyl ++ replicate (nSpondees -1) Spondee
+    | otherwise = []
   where
-    dactyl = Dactyl
-    spondee = Spondee
-    generateShapes :: Int -> Int -> [[Foot]]
-    generateShapes nDactyls nSpondees
-        | nDactyls + nSpondees == 6 =
-            map ((++ [spondee])) $
-                nub $
-                    permutations $
-                        replicate nDactyls dactyl ++ replicate (nSpondees -1) spondee
-        | otherwise = []
+    -- these fall out of the system of equations: 3d + 2s = σ | d + s = 6
+    nDactyls = fromIntegral syllables - 12
+    nSpondees = 18 - fromIntegral syllables
