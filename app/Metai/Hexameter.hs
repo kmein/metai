@@ -47,22 +47,16 @@ weightPattern :: [Syllable] -> [Length]
 weightPattern = map deriveWeight
   where
     deriveWeight syllable
-        | any (hasDiacritics [Dot, Acute, Circumflex, Ogonek]) core = Long
+        | any (hasDiacritics [Dot, Acute, Circumflex, Ogonek]) (nucleus syllable) = Long
         | length (rhyme syllable) > 1 = Long
         | otherwise = Short
-      where
-        core = nucleus syllable
 
 stressPattern :: [Syllable] -> [Length]
-stressPattern =
-    disambiguateStresses
-        . map deriveStress
+stressPattern = disambiguateStresses . map deriveStress
   where
     deriveStress syllable
-        | any (hasDiacritics [Grave, Acute, Circumflex]) core = Long
+        | any (hasDiacritics [Grave, Acute, Circumflex]) (nucleus syllable) = Long
         | otherwise = Unknown
-      where
-        core = nucleus syllable
     disambiguateStresses stresses =
         map
             ( \stress ->
