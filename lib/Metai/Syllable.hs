@@ -11,12 +11,16 @@ import Metai.Token (Diacritic (..), TextToken (..), hasDiacritics, isVowel, toke
 -------------------------------------------------------------------------------
 
 newtype Syllable = Syllable {getSyllable :: [TextToken]}
-  deriving (Show)
+    deriving (Show)
 
 segments, onset, rhyme, nucleus, coda :: Syllable -> [TextToken]
-segments = filter (\case
-  Sound _ _ -> True
-  _ -> False) . getSyllable
+segments =
+    filter
+        ( \case
+            Sound _ _ -> True
+            _ -> False
+        )
+        . getSyllable
 onset = takeWhile (not . tokenIsVowel) . segments
 rhyme = dropWhile (not . tokenIsVowel) . segments
 nucleus = takeWhile tokenIsVowel . rhyme
@@ -39,8 +43,8 @@ killInitialExtrasyllabic = \case
 killNonInitialExtrasyllabic :: [Syllable] -> [Syllable]
 killNonInitialExtrasyllabic = \case
     s1 : s2 : ss
-      | isExtrasyllabic s2 -> Syllable (segments s1 ++ segments s2) : killNonInitialExtrasyllabic ss
-      | otherwise -> s1 : killNonInitialExtrasyllabic (s2 : ss)
+        | isExtrasyllabic s2 -> Syllable (segments s1 ++ segments s2) : killNonInitialExtrasyllabic ss
+        | otherwise -> s1 : killNonInitialExtrasyllabic (s2 : ss)
     ss -> ss
 
 maximizeOnset :: [TextToken] -> [Syllable]
@@ -54,9 +58,14 @@ maximizeOnset tokens =
                     (_, current, _) -> [current]
                 )
                 $ zip3 (Space : tokens') tokens' (tail tokens' ++ [Space])
-    where tokens' = map (\case
-              SyllableBreak -> Space -- manual syllable separator is -
-              x -> x) tokens
+  where
+    tokens' =
+        map
+            ( \case
+                SyllableBreak -> Space
+                x -> x
+            )
+            tokens
 
 -- a "syllable" is extrasyllabic if it does not have a vocalic nucleus
 isExtrasyllabic :: Syllable -> Bool

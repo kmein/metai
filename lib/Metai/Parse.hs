@@ -2,20 +2,19 @@
 
 module Metai.Parse where
 
+import qualified Data.ByteString.Lazy as ByteString
+import Data.Csv
 import qualified Data.Text as Text
 import qualified Data.Text.Normalize as Text
+import qualified Data.Vector as Vector
 import Metai.Extra (debug)
 import Numeric.Natural (Natural)
-import Data.Csv
-import qualified Data.Vector as Vector
-import qualified Data.ByteString.Lazy as ByteString
 
-
-data Line = Line { lineBook :: Natural, lineVerse :: Natural, lineText :: Text.Text }
-  deriving (Show)
+data Line = Line {lineBook :: Natural, lineVerse :: Natural, lineText :: Text.Text}
+    deriving (Show)
 
 instance FromNamedRecord Line where
-  parseNamedRecord l = Line <$> (l .: "Book") <*> (l .: "Line") <*> (normalize <$> l .: "Text")
+    parseNamedRecord l = Line <$> (l .: "Book") <*> (l .: "Line") <*> (normalize <$> l .: "Text")
 
 normalize :: Text.Text -> Text.Text
 normalize =
@@ -46,5 +45,5 @@ metaiLines = do
     case decodeByName csvData :: Either String (Header, Vector.Vector Line) of
         Left err -> error err
         Right (_header, v) ->
-          let _ = debug "header" _header `seq` ()
-           in return $ Vector.toList v
+            let _ = debug "header" _header `seq` ()
+             in return $ Vector.toList v

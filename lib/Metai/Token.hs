@@ -4,10 +4,10 @@
 module Metai.Token where
 
 import Data.Function (on)
-import Data.Void (Void)
-import Data.Maybe (fromJust)
 import Data.List (intersect)
+import Data.Maybe (fromJust)
 import qualified Data.Text as Text
+import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char (char, string)
 
