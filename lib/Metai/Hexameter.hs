@@ -106,7 +106,7 @@ score x y = sum (zipWith scoreOne x y)
 
 possibleHexameterShapes :: Natural -> [[Foot]]
 possibleHexameterShapes syllables
-    | nDactyls + nSpondees == 6 =
+    | nDactyls > 0 && nSpondees > 0 && nDactyls + nSpondees == 6 =
         filter ((== Spondee) . last) . nub . permutations $
             replicate nDactyls Dactyl ++ replicate nSpondees Spondee
     | otherwise = []

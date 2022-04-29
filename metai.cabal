@@ -5,21 +5,42 @@ author:             Kierán Meinhardt
 maintainer:         kmein@posteo.de
 extra-source-files: metai.csv
 
-executable metai
-    main-is:          Main.hs
-    build-depends:    base ^>=4.14.3.0
-                    , megaparsec
-                    , unicode-transforms
-                    , text
-                    , split
-                    , cassava
-                    , bytestring
-                    , vector
-    other-modules:    Metai.Extra
+library
+    hs-source-dirs:   lib
+    exposed-modules:  Metai.Extra
                     , Metai.Parse
                     , Metai.Token
                     , Metai.Syllable
                     , Metai.Hexameter
-    hs-source-dirs:   app
+    build-depends:    base ^>=4.14.3.0
+                    , megaparsec
+                    , bytestring >= 0.10 && < 0.11
+                    , vector >= 0.12 && < 0.13
+                    , cassava >= 0.5 && < 0.6
+                    , unicode-transforms >= 0.3 && < 0.4
+                    , text >= 1 && < 2
+                    , split >= 0.2 && < 0.3
     default-language: Haskell2010
-    ghc-options:      -O2 -Wall -threaded
+    ghc-options:      -O2 -Wall
+
+executable metai
+    main-is:          Main.hs
+    hs-source-dirs:   app
+    build-depends:    base ^>=4.14.3.0
+                    , metai
+                    , text >= 1 && < 2
+                    , cassava >= 0.5 && < 0.6
+                    , bytestring >= 0.10 && < 0.11
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall
+
+test-suite metai-test
+    type:             exitcode-stdio-1.0
+    main-is:          Spec.hs
+    hs-source-dirs:   test
+    build-depends:    base ^>=4.14.3.0
+                    , metai
+                    , tasty
+                    , tasty-hunit
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall
