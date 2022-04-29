@@ -53,7 +53,10 @@ maximizeOnset tokens =
                         | classPrevious >= classCurrent && classCurrent < classNext -> [Space, current]
                     (_, current, _) -> [current]
                 )
-                $ zip3 (Space : tokens) tokens (tail tokens ++ [Space])
+                $ zip3 (Space : tokens') tokens' (tail tokens' ++ [Space])
+    where tokens' = map (\case
+              SyllableBreak -> Space -- manual syllable separator is -
+              x -> x) tokens
 
 -- a "syllable" is extrasyllabic if it does not have a vocalic nucleus
 isExtrasyllabic :: Syllable -> Bool

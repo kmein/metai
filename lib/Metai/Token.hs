@@ -15,7 +15,7 @@ import Text.Megaparsec.Char (char, string)
 -- Token type + helper functions
 --------------------------------------------------------------------------------
 
-data TextToken = Space | Punctuation | Sound SonorityClass Char
+data TextToken = Space | Punctuation | Sound SonorityClass Char | SyllableBreak
     deriving (Show, Eq)
 
 data SonorityClass
@@ -52,6 +52,7 @@ renderTokens :: [TextToken] -> String
 renderTokens = map $ \case
     Sound _ c -> c
     Punctuation -> '/'
+    SyllableBreak -> '.'
     Space -> ' '
 
 isVowel :: SonorityClass -> Bool
@@ -103,5 +104,6 @@ textToken =
         , Sound (Plosive Voiced) <$> oneOf ['b', 'd', 'g']
         , Sound Nasal <$> (('n' <$ string "ň") <|> oneOf ['m', 'n'])
         , Punctuation <$ oneOf ("/()!,?.:;-" :: [Char])
+        , SyllableBreak <$ char '|'
         , Space <$ oneOf (" \n" :: [Char])
         ]
