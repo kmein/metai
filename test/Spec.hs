@@ -1,7 +1,9 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
+import qualified Data.Text as Text
 import Metai.Hexameter
 import Metai.Parse
 import Metai.Syllable

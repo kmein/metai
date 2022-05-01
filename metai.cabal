@@ -8,6 +8,7 @@ extra-source-files: metai.csv
 library
     hs-source-dirs:   lib
     exposed-modules:  Metai.Extra
+                    , Metai.Caesura
                     , Metai.Parse
                     , Metai.Token
                     , Metai.Syllable
@@ -31,6 +32,7 @@ executable metai
                     , text >= 1 && < 2
                     , cassava >= 0.5 && < 0.6
                     , bytestring >= 0.10 && < 0.11
+                    , containers
     default-language: Haskell2010
     ghc-options:      -O2 -Wall
 
@@ -40,6 +42,7 @@ test-suite metai-test
     hs-source-dirs:   test
     build-depends:    base ^>=4.14.3.0
                     , metai
+                    , text >= 1 && < 2
                     , tasty
                     , tasty-hunit
     default-language: Haskell2010
