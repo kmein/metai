@@ -2,23 +2,24 @@
 
 module Metai.Caesura where
 
-import Data.List (intercalate, sort)
+import Data.List (intercalate)
 import qualified Data.Text as Text
 import Metai.Hexameter (Foot (..), footToPattern)
 import Metai.Parse (Line (..))
-import Metai.Syllable (syllabify)
+import Metai.Syllable (Syllable, syllabify)
 import Metai.Token (tokenize)
 
-data Caesura = Trithemimeres | Penthemimeres | KataTritonTrochaion | Hephthemimeres | BucolicDiaeresis
-  deriving (Eq, Ord)
+data Caesura = Trithemimeres | Penthemimeres | KataTritonTrochaion | Hephthemimeres | PostQuartumTrochaeum | BucolicDiaeresis
+    deriving (Eq)
 
 instance Show Caesura where
     show = \case
-        Trithemimeres -> "3H"
-        Penthemimeres -> "5H"
-        Hephthemimeres -> "7H"
-        BucolicDiaeresis -> "BD"
-        KataTritonTrochaion -> "KTT"
+        Trithemimeres -> "3h"
+        Penthemimeres -> "5h"
+        Hephthemimeres -> "7h"
+        BucolicDiaeresis -> "bd"
+        KataTritonTrochaion -> "ktt"
+        PostQuartumTrochaeum -> "pqt"
     showList xs x = intercalate "+" (map show xs) ++ x
 
 versePosition :: Caesura -> [Foot] -> Int
@@ -28,6 +29,7 @@ versePosition caesura feet = case caesura of
     Hephthemimeres -> countSyllables (take 3 feet) + 1
     BucolicDiaeresis -> countSyllables (take 4 feet)
     KataTritonTrochaion -> versePosition Penthemimeres feet + 1
+    PostQuartumTrochaeum -> versePosition Hephthemimeres feet + 1
   where
     countSyllables = sum . map (length . footToPattern)
 
@@ -43,17 +45,19 @@ listBoundaryAfter nElements xsxss =
           where
             lengthFirst = length xs
 
+hasCaesura :: [Foot] -> [[Syllable]] -> Caesura -> Bool
+hasCaesura scansion syllables caesura =
+    (if caesura == KataTritonTrochaion then scansion !! 2 == Dactyl else True)
+        && (if caesura == PostQuartumTrochaeum then scansion !! 3 == Dactyl else True)
+        && listBoundaryAfter (versePosition caesura scansion) syllables
+
 caesuras :: Maybe [[Foot]] -> Line -> Maybe [[Caesura]]
 caesuras analysis line =
     map
         ( \scansion ->
-          sort
-            (filter
-                (\caesura -> listBoundaryAfter (versePosition caesura scansion) syllables)
-                [Trithemimeres, Penthemimeres, Hephthemimeres, BucolicDiaeresis]
-                ++ if (scansion !! 2 == Dactyl) && listBoundaryAfter (versePosition KataTritonTrochaion scansion) syllables
-                    then [KataTritonTrochaion]
-                    else [])
+            filter
+                (hasCaesura scansion syllables)
+                [Trithemimeres, Penthemimeres, KataTritonTrochaion, Hephthemimeres, PostQuartumTrochaeum, BucolicDiaeresis]
         )
         <$> analysis
   where
