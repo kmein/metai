@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Text (Text, pack)
 import qualified Data.Text as Text
 import Metai.Caesura (caesuras)
-import Metai.Hexameter (Foot (..), analyse, footToPattern, metrePattern, score, stressPattern, weightPattern)
+import Metai.Hexameter (Foot (..), analyse, footToPattern, metrePattern, distance, stressPattern, weightPattern)
 import Metai.Parse (Line (..), metaiLines)
 import Metai.Syllable (syllabify)
 import Metai.Token (tokenize)
@@ -54,11 +54,11 @@ main = do
                         , ("scansion", display (map renderFoot) analysis)
                         , ("caesuras", display show $ caesuras analysis line)
                         , ("metre", pack $ show metres)
-                        , ("metreConflict", display (show . score metres) feet)
+                        , ("metreConflict", display (show . distance metres) feet)
                         , ("stress", pack $ show stresses)
-                        , ("stressConflict", display (show . score stresses) feet)
+                        , ("stressConflict", display (show . distance stresses) feet)
                         , ("weight", pack $ show weights)
-                        , ("weightConflict", display (show . score weights) feet)
+                        , ("weightConflict", display (show . distance weights) feet)
                         ] ::
                             Map Text Text
                 )

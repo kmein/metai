@@ -87,8 +87,8 @@ analyse line =
                     minimumOn fst $
                         groupOn
                             ( \analysis ->
-                                debug' (name ++ " score   ") $
-                                    score
+                                debug' (name ++ " distance") $
+                                    distance
                                         (debug' (name ++ " analysis") $ concatMap footToPattern analysis)
                                         (debug' (name ++ " pattern ") $ concatMap pattern syllables)
                             )
@@ -97,12 +97,12 @@ analyse line =
             >>= analyseWith "stress" stressPattern
             >>= analyseWith "weight" weightPattern
 
-score :: [Length] -> [Length] -> Natural
-score x y = sum (zipWith scoreOne x y)
+distance :: [Length] -> [Length] -> Natural
+distance x y = sum (zipWith distanceOne x y)
   where
-    scoreOne Long Short = 1
-    scoreOne Short Long = 1
-    scoreOne _ _ = 0
+    distanceOne Long Short = 1
+    distanceOne Short Long = 1
+    distanceOne _ _ = 0
 
 possibleHexameterShapes :: Natural -> [[Foot]]
 possibleHexameterShapes syllables
