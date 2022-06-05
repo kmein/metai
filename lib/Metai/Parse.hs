@@ -20,6 +20,7 @@ normalize :: Text.Text -> Text.Text
 normalize =
     Text.replace "sz" "š"
         . Text.replace "cz" "č"
+        . Text.replace "dz" "dž"
         . Text.replace "ż" "ž"
         . Text.replace "ź" "ž"
         . Text.replace "ž" "ž"
@@ -28,6 +29,7 @@ normalize =
         . Text.replace "cż" "č"
         . Text.replace "ſ" "s"
         . Text.replace "ʒ" "z"
+        . Text.replace "w" "v"
         . Text.replace "ů" "uo"
         . Text.replace "ë" "ie"
         . Text.replace "ı" "i"

@@ -92,9 +92,9 @@ textToken =
                         , Grave <$ char '\x300'
                         ]
             return $ Sound (Vowel diacritics) vowel
-        , Sound Plosive <$> (try ('ǳ' <$ string "dz") <|> ('ʤ' <$ string "dž") <|> ('ʦ' <$ char 'c') <|> ('ʧ' <$ char 'č') <|> oneOf ['p', 't', 'k', 'b', 'd', 'g'])
+        , Sound Occlusive <$> (('ʤ' <$ string "dž") <|> ('ʦ' <$ char 'c') <|> ('ʧ' <$ char 'č') <|> oneOf ['p', 't', 'k', 'b', 'd', 'g'])
         , Sound Sibilant <$> (oneOf ['s', 'z'] <|> ('ʒ' <$ char 'ž') <|> ('ʃ' <$ char 'š'))
-        , Sound Resonant <$> (('n' <$ string "ň") <|> oneOf ['m', 'n', 'j', 'l', 'v'] <|> ('v' <$ char 'w') <|> (char 'r' <* optional (char '\x302')))
+        , Sound Resonant <$> (('n' <$ string "ň") <|> oneOf ['m', 'n', 'j', 'l', 'v'] <|> (char 'r' <* optional (char '\x302')))
         , Punctuation <$ oneOf ("/()!,?.:;-" :: [Char])
         , SyllableBreak <$ char '|'
         , Space <$ oneOf (" \n" :: [Char])
