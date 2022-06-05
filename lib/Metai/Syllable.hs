@@ -50,7 +50,7 @@ syllable = do
   codaOcclusive <- optionalTwice occlusive
   codaResonant <- optionalTwice resonant -- sometimes written twice; e.g. 1.33
   vowels <- some vowel
-  onglide <- optional $ satisfy (== Sound Resonant 'j') -- needed for 1.15 Kurmjei
+  onglide <- optional $ satisfy (== Sound Resonant 'j') -- needed for spellings such as Kurmjei, pirmjaus
   onsetResonant <- optional resonant
   onsetOcclusive <- optional occlusive
   onsetSibilant <- optional sibilant -- 1.423 kàd wiſſ miegôt'
