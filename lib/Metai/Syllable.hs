@@ -1,10 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Metai.Syllable (Syllable, syllabify, segments, onset, rhyme, nucleus, coda) where
+module Metai.Syllable (Syllable, syllabify, segments, onset, rhyme, nucleus, coda, syllable) where
 
-import Data.List.Split (splitOn)
-import Data.Maybe (isNothing, mapMaybe)
-import Metai.Token (Diacritic (..), TextToken (..), hasDiacritics, isVowel, tokenIsVowel)
+import Data.Maybe (maybeToList)
+import Metai.Token (TextToken (..), Phonology(..), tokenIsVowel)
+import Text.Megaparsec
+import Data.Void (Void)
 
 -------------------------------------------------------------------------------
 -- Syllable definition + helper functions
@@ -31,48 +32,56 @@ coda = dropWhile tokenIsVowel . rhyme
 -------------------------------------------------------------------------------
 
 syllabify :: [TextToken] -> [Syllable]
-syllabify = killNonInitialExtrasyllabic . killInitialExtrasyllabic . maximizeOnset
+syllabify toks = case parse (syllable `someTill` eof) "" (reverse toks) of
+  Right syls -> reverse syls
+  Left e -> error (show e) -- reverse . fromJust . parseMaybe (syllable `someTill` eof) . reverse
 
-killInitialExtrasyllabic :: [Syllable] -> [Syllable]
-killInitialExtrasyllabic = \case
-    syllables@(s1 : s2 : ss)
-        | isExtrasyllabic s1 -> Syllable (segments s1 ++ segments s2) : ss
-        | otherwise -> syllables
-    syllables -> syllables
-
-killNonInitialExtrasyllabic :: [Syllable] -> [Syllable]
-killNonInitialExtrasyllabic = \case
-    s1 : s2 : ss
-        | isExtrasyllabic s2 -> Syllable (segments s1 ++ segments s2) : killNonInitialExtrasyllabic ss
-        | otherwise -> s1 : killNonInitialExtrasyllabic (s2 : ss)
-    ss -> ss
-
-maximizeOnset :: [TextToken] -> [Syllable]
-maximizeOnset tokens =
-    map Syllable $
-        splitOn [Space] $
-            concatMap
-                ( \case
-                    (Sound classPrevious _, current@(Sound classCurrent _), Sound classNext _)
-                        | classPrevious >= classCurrent && classCurrent < classNext -> [Space, current]
-                    (_, current, _) -> [current]
-                )
-                $ zip3 (Space : tokens') tokens' (tail tokens' ++ [Space])
+-- parse in reverse: figure out syllables from right to left
+syllable :: Parsec Void [TextToken] Syllable
+syllable = do
+  afterPunctuation <- many $ satisfy (== Punctuation)
+  finalS <- optional $ satisfy $ \case
+    Sound Sibilant x | x == 's' -> True -- special case for 1.314
+    _ -> False
+  imperativeOrInfinitive <- optional $ satisfy $ \case
+    Sound Plosive x | x == 'k' || x == 't' -> True
+    _ -> False
+  codaSibilant <- optionalTwice sibilant
+  codaPlosive <- optionalTwice plosive
+  codaResonant <- optionalTwice resonant -- sometimes written twice; e.g. 1.33
+  vowels <- some vowel
+  onglide <- optional $ satisfy (== Sound Resonant 'j') -- needed for 1.15 Kurmjei
+  onsetResonant <- optional resonant
+  onsetPlosive <- optional plosive
+  onsetSibilant <- optional sibilant
+  _ <- optional (satisfy (== SyllableBreak))
+  beforePunctuation <- many $ satisfy (== Punctuation)
+  return $ Syllable $ concat
+    [ beforePunctuation
+    , maybeToList onsetSibilant
+    , maybeToList onsetPlosive
+    , maybeToList onsetResonant
+    , maybeToList onglide
+    , reverse vowels
+    , codaResonant
+    , codaPlosive
+    , codaSibilant
+    , maybeToList imperativeOrInfinitive
+    , maybeToList finalS
+    , afterPunctuation
+    ]
   where
-    tokens' =
-        map
-            ( \case
-                SyllableBreak -> Space
-                x -> x
-            )
-            tokens
-
--- a "syllable" is extrasyllabic if it does not have a vocalic nucleus
-isExtrasyllabic :: Syllable -> Bool
-isExtrasyllabic syllable = case classes $ segments syllable of
-    [] -> False
-    xs -> not $ isVowel $ maximum xs
-  where
-    classes = mapMaybe $ \case
-        Sound theClass _ -> Just theClass
-        _ -> Nothing
+    optionalTwice parser = do
+      x <- optional parser
+      y <- optional parser
+      return $ maybeToList x ++ maybeToList y
+    vowel = satisfy tokenIsVowel
+    plosive = satisfy $ \case
+      Sound Plosive _ -> True
+      _ -> False
+    sibilant = satisfy $ \case
+      Sound Sibilant _ -> True
+      _ -> False
+    resonant = satisfy $ \case
+      Sound Resonant _ -> True
+      _ -> False

@@ -1,10 +1,13 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Metai.Token where
 
-import Data.Function (on)
 import Data.List (intersect)
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromJust)
 import qualified Data.Text as Text
 import Data.Void (Void)
@@ -15,38 +18,33 @@ import Text.Megaparsec.Char (char, string)
 -- Token type + helper functions
 --------------------------------------------------------------------------------
 
-data TextToken = Space | Punctuation | Sound SonorityClass Char | SyllableBreak
-    deriving (Show, Eq)
+data TextToken = Space | Punctuation | Sound Phonology Char | SyllableBreak
+    deriving (Show, Eq, Ord)
 
-data SonorityClass
-    = Vowel [Diacritic]
-    | Glide
-    | Rhotic
-    | Lateral
-    | Nasal
-    | Affricate Voice
-    | Fricative Voice
-    | Plosive Voice
-    deriving (Show, Eq)
+data Phonology = Sibilant | Plosive | Resonant | Vowel [Diacritic]
+  deriving (Show, Eq, Ord)
 
 data Diacritic = Ogonek | Dot | Acute | Grave | Circumflex | Breve
-    deriving (Show, Eq)
+    deriving (Show, Eq, Ord)
 
-data Voice = Voiced | Unvoiced
-    deriving (Show, Eq)
+instance VisualStream [TextToken] where
+  showTokens _ (t :| ts) = renderTokens (t:ts)
 
-instance Ord SonorityClass where
-    compare =
-        compare `on` \case
-            Plosive _ -> 1 :: Int
-            Affricate _ -> 2
-            Fricative Unvoiced -> 2
-            Fricative Voiced -> 3
-            Nasal -> 4
-            Lateral -> 5
-            Rhotic -> 5
-            Glide -> 6
-            Vowel _ -> 7
+instance TraversableStream [TextToken] where
+  -- https://hackage.haskell.org/package/megaparsec-9.2.1/docs/src/Text.Megaparsec.Stream.html#reachOffsetNoLine%27
+  reachOffsetNoLine o PosState {..} =
+      ( PosState
+          { pstateInput = post,
+            pstateOffset = max pstateOffset o,
+            pstateSourcePos = spos,
+            pstateTabWidth = pstateTabWidth,
+            pstateLinePrefix = pstateLinePrefix
+          }
+      )
+      where
+        spos = case pstateSourcePos of
+          (SourcePos n l c) -> SourcePos n l (c <> pos1)
+        post = drop (o - pstateOffset) pstateInput
 
 renderTokens :: [TextToken] -> String
 renderTokens = map $ \case
@@ -55,14 +53,14 @@ renderTokens = map $ \case
     SyllableBreak -> '.'
     Space -> ' '
 
-isVowel :: SonorityClass -> Bool
+isVowel :: Phonology -> Bool
 isVowel = \case
     Vowel _ -> True
     _ -> False
 
 tokenIsVowel :: TextToken -> Bool
 tokenIsVowel = \case
-    Sound sonority _ -> isVowel sonority
+    Sound phonology _ -> isVowel phonology
     _ -> False
 
 hasDiacritics :: [Diacritic] -> TextToken -> Bool
@@ -94,15 +92,9 @@ textToken =
                         , Grave <$ char '\x300'
                         ]
             return $ Sound (Vowel diacritics) vowel
-        , Sound Lateral <$> char 'l'
-        , Sound Rhotic <$> (char 'r' <* optional (char '\x302'))
-        , Sound Glide <$> char 'j'
-        , Sound (Affricate Unvoiced) <$> oneOf ['c', 'č']
-        , Sound (Fricative Unvoiced) <$> oneOf ['s', 'š']
-        , Sound (Fricative Voiced) <$> (('v' <$ char 'w') <|> oneOf ['v', 'z', 'ž'])
-        , Sound (Plosive Unvoiced) <$> oneOf ['p', 't', 'k']
-        , Sound (Plosive Voiced) <$> oneOf ['b', 'd', 'g']
-        , Sound Nasal <$> (('n' <$ string "ň") <|> oneOf ['m', 'n'])
+        , Sound Plosive <$> (try ('ǳ' <$ string "dz") <|> ('ʤ' <$ string "dž") <|> ('ʦ' <$ char 'c') <|> ('ʧ' <$ char 'č') <|> oneOf ['p', 't', 'k', 'b', 'd', 'g'])
+        , Sound Sibilant <$> (oneOf ['s', 'z'] <|> ('ʒ' <$ char 'ž') <|> ('ʃ' <$ char 'š'))
+        , Sound Resonant <$> (('n' <$ string "ň") <|> oneOf ['m', 'n', 'j', 'l', 'v'] <|> ('v' <$ char 'w') <|> (char 'r' <* optional (char '\x302')))
         , Punctuation <$ oneOf ("/()!,?.:;-" :: [Char])
         , SyllableBreak <$ char '|'
         , Space <$ oneOf (" \n" :: [Char])

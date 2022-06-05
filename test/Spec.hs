@@ -24,11 +24,11 @@ syllabification =
     let syllabify' = map (renderTokens . segments) . syllabify . tokenize . normalize
      in testGroup
             "Syllabification"
-            [ testCase "extrasyllabics" $ ["žvaigž", "dems"] @=? syllabify' "żwaigżdėms"
+            [ testCase "extrasyllabics" $ ["ʒvaig", "ʒdems"] @=? syllabify' "żwaigżdėms"
             , testCase "simple" $ ["sau", "le", "le"] @=? syllabify' "Sauléle"
             , testCase "geminate" $ ["bud", "di", "no"] @=? syllabify' "buddı̆nŏ"
-            , testCase "diphthong" $ ["džau", "ges"] @=? syllabify' "dʒ̇augės"
-            , testCase "ignore morphology :|" $ ["i", "šim", "ti"] @=? syllabify' "iſʒimtı̆"
+            , testCase "diphthong" $ ["ʤau", "ges"] @=? syllabify' "dʒ̇augės"
+            , testCase "ignore morphology :|" $ ["i", "ʃim", "ti"] @=? syllabify' "iſʒimtı̆"
             , testCase "ignore morphology :(" $ ["pri", "siest"] @=? syllabify' "prı̆ſı̆ėſt'"
             , testCase "enforce morphology :)" $ ["pri", "si", "est"] @=? syllabify' "prı̆ſı̆|ėſt'"
             ]
