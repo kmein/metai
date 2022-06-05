@@ -65,7 +65,7 @@ stressPattern = disambiguateStresses . map deriveStress
                         if any (== Long) stresses
                             then Short
                             else
-                                if length (filter (== Unknown) stresses) == 1 -- are we the only undecided syllable
+                                if length (filter (== Unknown) stresses) == 1 && length stresses > 1 -- are we the only undecided syllable
                                     then Long
                                     else stress
                     else stress
