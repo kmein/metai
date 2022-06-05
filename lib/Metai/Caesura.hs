@@ -34,16 +34,8 @@ versePosition caesura feet = case caesura of
     countSyllables = sum . map (length . footToPattern)
 
 listBoundaryAfter :: Int -> [[a]] -> Bool
-listBoundaryAfter nElements xsxss =
-    case xsxss of
-        [] -> False
-        (xs : xss)
-            | lengthFirst == nElements -> True
-            | lengthFirst > nElements -> False
-            | lengthFirst < nElements -> listBoundaryAfter (nElements - lengthFirst) xss
-            | otherwise -> error "derp"
-          where
-            lengthFirst = length xs
+listBoundaryAfter nElements =
+    elem 0 . scanl (\remainingSyllables word -> remainingSyllables - length word) nElements
 
 hasCaesura :: [Foot] -> [[Syllable]] -> Caesura -> Bool
 hasCaesura scansion syllables caesura =
