@@ -21,7 +21,7 @@ import Text.Megaparsec.Char (char, string)
 data TextToken = Space | Punctuation | Sound Phonology Char | SyllableBreak
     deriving (Show, Eq, Ord)
 
-data Phonology = Sibilant | Plosive | Resonant | Vowel [Diacritic]
+data Phonology = Sibilant | Occlusive | Resonant | Vowel [Diacritic]
   deriving (Show, Eq, Ord)
 
 data Diacritic = Ogonek | Dot | Acute | Grave | Circumflex | Breve

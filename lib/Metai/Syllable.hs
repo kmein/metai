@@ -44,27 +44,27 @@ syllable = do
     Sound Sibilant x | x == 's' -> True -- special case for 1.314
     _ -> False
   imperativeOrInfinitive <- optional $ satisfy $ \case
-    Sound Plosive x | x == 'k' || x == 't' -> True
+    Sound Occlusive x | x == 'k' || x == 't' -> True
     _ -> False
   codaSibilant <- optionalTwice sibilant
-  codaPlosive <- optionalTwice plosive
+  codaOcclusive <- optionalTwice occlusive
   codaResonant <- optionalTwice resonant -- sometimes written twice; e.g. 1.33
   vowels <- some vowel
   onglide <- optional $ satisfy (== Sound Resonant 'j') -- needed for 1.15 Kurmjei
   onsetResonant <- optional resonant
-  onsetPlosive <- optional plosive
-  onsetSibilant <- optional sibilant
+  onsetOcclusive <- optional occlusive
+  onsetSibilant <- optional sibilant -- 1.423 kàd wiſſ miegôt'
   _ <- optional (satisfy (== SyllableBreak))
   beforePunctuation <- many $ satisfy (== Punctuation)
   return $ Syllable $ concat
     [ beforePunctuation
     , maybeToList onsetSibilant
-    , maybeToList onsetPlosive
+    , maybeToList onsetOcclusive
     , maybeToList onsetResonant
     , maybeToList onglide
     , reverse vowels
     , codaResonant
-    , codaPlosive
+    , codaOcclusive
     , codaSibilant
     , maybeToList imperativeOrInfinitive
     , maybeToList finalS
@@ -76,8 +76,8 @@ syllable = do
       y <- optional parser
       return $ maybeToList x ++ maybeToList y
     vowel = satisfy tokenIsVowel
-    plosive = satisfy $ \case
-      Sound Plosive _ -> True
+    occlusive = satisfy $ \case
+      Sound Occlusive _ -> True
       _ -> False
     sibilant = satisfy $ \case
       Sound Sibilant _ -> True
