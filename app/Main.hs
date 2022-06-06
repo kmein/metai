@@ -28,6 +28,7 @@ main = do
             [ "book"
             , "verse"
             , "text"
+            , "words"
             , "syllables"
             , "scansion"
             , "caesuras"
@@ -40,17 +41,19 @@ main = do
             ]
             $ map
                 ( \line@Line{..} ->
-                    let syllables = concatMap (syllabify . tokenize) $ Text.words lineText
+                    let lineWords = Text.words lineText
+                        syllables = map (syllabify . tokenize) lineWords
                         analysis = analyse line
                         feet = map (concatMap footToPattern) <$> (analysis)
                         display f = pack . maybe "NA" (intercalate "|" . map f)
-                        weights = weightPattern syllables
-                        metres = metrePattern syllables
-                        stresses = stressPattern syllables
+                        weights = concatMap weightPattern syllables
+                        metres = concatMap metrePattern syllables
+                        stresses = concatMap stressPattern syllables
                      in [ ("book", pack $ show lineBook)
                         , ("verse", pack $ show lineVerse)
                         , ("text", lineText)
-                        , ("syllables", pack $ show $ length syllables)
+                        , ("syllables", pack $ show $ length $ concat syllables)
+                        , ("words", pack $ show $ length lineWords)
                         , ("scansion", display (map renderFoot) analysis)
                         , ("caesuras", display show $ caesuras analysis line)
                         , ("metre", pack $ show metres)
