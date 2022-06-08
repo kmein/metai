@@ -10,7 +10,10 @@ import Metai.Syllable (Syllable, syllabify)
 import Metai.Token (tokenize)
 
 data Caesura = Trithemimeres | Penthemimeres | KataTritonTrochaion | Hephthemimeres | PostQuartumTrochaeum | BucolicDiaeresis
-    deriving (Eq)
+    deriving (Eq, Bounded, Enum)
+
+allCaesuras :: [Caesura]
+allCaesuras = [minBound .. maxBound]
 
 instance Show Caesura where
     show = \case
