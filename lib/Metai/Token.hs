@@ -83,8 +83,8 @@ textToken =
             vowel <- oneOf ['a', 'e', 'i', 'o', 'u', 'y']
             diacritics <-
                 many $
-                    foldr1 (<|>) $
-                        [ Ogonek <$ oneOf ['\x328', '\x31C']
+                    foldr1 (<|>)
+                        [ Ogonek <$ oneOf ['\x328', '\x31C', '\x337']
                         , Acute <$ char '\x301'
                         , Dot <$ char '\x307'
                         , Breve <$ oneOf ['\x306', '\x303']
@@ -95,7 +95,7 @@ textToken =
         , Sound Occlusive <$> (('ʤ' <$ string "dž") <|> ('ʦ' <$ char 'c') <|> ('ʧ' <$ char 'č') <|> oneOf ['p', 't', 'k', 'b', 'd', 'g'])
         , Sound Sibilant <$> (oneOf ['s', 'z'] <|> ('ʒ' <$ char 'ž') <|> ('ʃ' <$ char 'š'))
         , Sound Resonant <$> (('n' <$ string "ň") <|> oneOf ['m', 'n', 'j', 'l', 'v'] <|> (char 'r' <* optional (char '\x302')))
-        , Punctuation <$ oneOf ("/()!,?.:;-" :: [Char])
+        , Punctuation <$ oneOf ("/()!,?.:;-|–" :: [Char])
         , SyllableBreak <$ char '|'
         , Space <$ oneOf (" \n" :: [Char])
         ]

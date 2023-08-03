@@ -7,5 +7,7 @@ haskellPackages.developPackage {
     ghcid
     (hoogleLocal { packages = drv.propagatedBuildInputs; })
     fourmolu
+    python3Packages.lxml
+    gnused
   ]);
 }

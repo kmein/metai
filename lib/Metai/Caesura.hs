@@ -42,8 +42,8 @@ listBoundaryAfter nElements =
 
 hasCaesura :: [Foot] -> [[Syllable]] -> Caesura -> Bool
 hasCaesura scansion syllables caesura =
-    (if caesura == KataTritonTrochaion then scansion !! 2 == Dactyl else True)
-        && (if caesura == PostQuartumTrochaeum then scansion !! 3 == Dactyl else True)
+    ((caesura /= KataTritonTrochaion) || (scansion !! 2 == Dactyl))
+        && ((caesura /= PostQuartumTrochaeum) || (scansion !! 3 == Dactyl))
         && listBoundaryAfter (versePosition caesura scansion) syllables
 
 caesuras :: Maybe [[Foot]] -> Line -> Maybe [[Caesura]]

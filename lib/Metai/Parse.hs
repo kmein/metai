@@ -7,10 +7,10 @@ import Data.Csv
 import qualified Data.Text as Text
 import qualified Data.Text.Normalize as Text
 import qualified Data.Vector as Vector
-import Metai.Extra (debug)
 import Numeric.Natural (Natural)
+import Metai.Extra (debug)
 
-data Line = Line {lineBook :: Natural, lineVerse :: Natural, lineText :: Text.Text}
+data Line = Line {lineBook :: Natural, lineVerse :: Text.Text, lineText :: Text.Text}
     deriving (Show)
 
 instance FromNamedRecord Line where
@@ -34,12 +34,29 @@ normalize =
         . Text.replace "ë" "ie"
         . Text.replace "ı" "i"
         . Text.replace "'" ""
+        . Text.replace "’" ""
+        . Text.replace " -" "-"
+        . Text.replace " ;" ";"
+        . Text.replace " –" "–"
+        . Text.replace " /" "/"
+        . Text.replace " |" "|"
         . Text.replace "]" ""
         . Text.replace "[" ""
-        . Text.replace " -" "-"
-        . Text.replace " /" "/"
+        . Text.replace "<" ""
+        . Text.replace ">" ""
+        . Text.replace "{" ""
+        . Text.replace "}" ""
+        . Text.replace "\x306’i" "’i\x306" -- PL 239
         . Text.normalize Text.NFD
         . Text.toLower
+        . Text.replace "A., B, C." "A, Bė, Cė" -- PL 348
+        . Text.replace "n\x304" "nn" -- nn abbreviation with macron, e.g. PL 595
+        . Text.replace "å" "ă" -- PL 611
+        . Text.replace ": " "" -- WD 416
+        . Text.replace "„" "" -- PL 173
+        . Text.replace "„ " "" -- WD 416
+        . Text.replace "“" "" -- RG 241
+        . Text.replace "`I" "Ì" -- RG 2
 
 metaiLines :: IO [Line]
 metaiLines = do
