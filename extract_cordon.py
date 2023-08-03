@@ -34,7 +34,7 @@ cleft_word = re.compile(r'(\S*)_1 \1_2')
 
 def evaluate(line: ET.Element) -> tuple[str, str]:
     xml_id = line.attrib[f"{{{prefix_map['xml']}}}id"]
-    words = line.xpath("./unit/w[@xml:lang='olt' or @xml:lang='oli' or @xml:lang='olit' or @xml:lang='']|./pc", namespaces=prefix_map)
+    words = line.xpath("./unit/w[@xml:lang='olt' or @xml:lang='oli' or @xml:lang='olit' or @xml:lang='olt olt' or @xml:lang='']|./pc", namespaces=prefix_map)
     text = re.sub(
         pattern='„ ',
         repl='„',
