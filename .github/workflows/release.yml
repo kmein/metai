@@ -1,0 +1,28 @@
+name: "pre-release"
+on:
+  push:
+    branches:
+      - "master"
+jobs:
+  pre-release:
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Nix
+        uses: cachix/install-nix-action@v16
+      - name: metai.csv
+        run: nix build $GITHUB_WORKSPACE#metai-csv --out-link metai.csv
+      - name: metai-scansion.csv
+        run: nix build $GITHUB_WORKSPACE#metai-scansion-csv --out-link metai-scansion.csv
+      - name: assets
+        run: nix build $GITHUB_WORKSPACE#metai-assets --out-link assets
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Assets release"
+          files: |
+            *.csv
+            assets
