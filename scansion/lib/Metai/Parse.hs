@@ -7,8 +7,8 @@ import Data.Csv
 import qualified Data.Text as Text
 import qualified Data.Text.Normalize as Text
 import qualified Data.Vector as Vector
-import Numeric.Natural (Natural)
 import Metai.Extra (debug)
+import Numeric.Natural (Natural)
 
 data Line = Line {lineBook :: Natural, lineVerse :: Text.Text, lineText :: Text.Text}
     deriving (Show)

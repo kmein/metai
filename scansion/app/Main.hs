@@ -6,16 +6,16 @@
 module Main where
 
 import qualified Data.ByteString.Lazy as ByteString
-import Data.Text.Encoding
 import Data.Csv
 import Data.List (intercalate)
 import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Text (Text, pack)
 import qualified Data.Text as Text
+import Data.Text.Encoding
 import qualified Data.Vector as Vector
-import qualified Data.Map as Map
-import Metai.Caesura (caesuras, allCaesuras)
-import Metai.Hexameter (Foot (..), analyse, footToPattern, metrePattern, distance, stressPattern, weightPattern)
+import Metai.Caesura (allCaesuras, caesuras)
+import Metai.Hexameter (Foot (..), analyse, distance, footToPattern, metrePattern, stressPattern, weightPattern)
 import Metai.Parse (Line (..), metaiLines)
 import Metai.Syllable (syllabify)
 import Metai.Token (tokenize)
@@ -28,20 +28,22 @@ main = do
     allLines <- metaiLines
     ByteString.putStr $
         encodeByName
-            ([ "book"
-            , "verse"
-            , "text"
-            , "words"
-            , "syllables"
-            , "scansion"
-            ] <> Vector.fromList (map (encodeUtf8 . pack . show) allCaesuras) <>
-            [ "metre"
-            , "metreConflict"
-            , "stress"
-            , "stressConflict"
-            , "weight"
-            , "weightConflict"
-            ])
+            ( [ "book"
+              , "verse"
+              , "text"
+              , "words"
+              , "syllables"
+              , "scansion"
+              ]
+                <> Vector.fromList (map (encodeUtf8 . pack . show) allCaesuras)
+                <> [ "metre"
+                   , "metreConflict"
+                   , "stress"
+                   , "stressConflict"
+                   , "weight"
+                   , "weightConflict"
+                   ]
+            )
             $ map
                 ( \line@Line{..} ->
                     let lineWords = Text.words lineText
@@ -59,16 +61,17 @@ main = do
                         , ("syllables", pack $ show $ length $ concat syllables)
                         , ("words", pack $ show $ length lineWords)
                         , ("scansion", display (map renderFoot) analysis)
-                        ] `Map.union` Map.fromList (map (\c -> (pack $ show c, display show (map (elem c) <$> lineCaesuras))) allCaesuras) `Map.union`
-                        [
-                        -- , ("caesuras", display show $ caesuras analysis line)
-                          ("metre", pack $ show metres)
-                        , ("metreConflict", display (show . distance metres) feet)
-                        , ("stress", pack $ show stresses)
-                        , ("stressConflict", display (show . distance stresses) feet)
-                        , ("weight", pack $ show weights)
-                        , ("weightConflict", display (show . distance weights) feet)
-                        ] ::
+                        ]
+                            `Map.union` Map.fromList (map (\c -> (pack $ show c, display show (map (elem c) <$> lineCaesuras))) allCaesuras)
+                            `Map.union` [
+                                          -- , ("caesuras", display show $ caesuras analysis line)
+                                          ("metre", pack $ show metres)
+                                        , ("metreConflict", display (show . distance metres) feet)
+                                        , ("stress", pack $ show stresses)
+                                        , ("stressConflict", display (show . distance stresses) feet)
+                                        , ("weight", pack $ show weights)
+                                        , ("weightConflict", display (show . distance weights) feet)
+                                        ] ::
                             Map Text Text
                 )
                 allLines
