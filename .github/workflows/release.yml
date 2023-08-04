@@ -17,6 +17,7 @@ jobs:
         run: nix build $GITHUB_WORKSPACE#metai-scansion-csv --out-link metai-scansion.csv
       - name: assets
         run: nix build $GITHUB_WORKSPACE#metai-assets --out-link assets
+      - run: zip assets.zip assets/*
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -25,4 +26,4 @@ jobs:
           title: "Assets release"
           files: |
             *.csv
-            assets
+            assets.zip
