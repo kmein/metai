@@ -54,7 +54,7 @@ main = do
                         stresses = concatMap stressPattern syllables
                         lineCaesuras = caesuras analysis line
                      in [ ("book", pack $ show lineBook)
-                        , ("verse", pack $ show lineVerse)
+                        , ("verse", lineVerse)
                         , ("text", lineText)
                         , ("syllables", pack $ show $ length $ concat syllables)
                         , ("words", pack $ show $ length lineWords)

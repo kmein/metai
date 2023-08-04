@@ -33,8 +33,19 @@ normalize =
         . Text.replace "ů" "uo"
         . Text.replace "ë" "ie"
         . Text.replace "ı" "i"
+        . Text.replace "n\x304" "nn" -- nn abbreviation with macron, e.g. PL 595
+        . Text.normalize Text.NFD
+        . Text.toLower
+        . Text.replace "A., B, C." "A, Bė, Cė" -- PL 348
+        . Text.replace "å" "ă" -- PL 611
+        . Text.replace ": " "" -- WD 416
+        . Text.replace "„" "" -- PL 173
+        . Text.replace "„ " "" -- WD 416
+        . Text.replace "“" "" -- RG 241
+        . Text.replace "`I" "Ì" -- RG 2
         . Text.replace "'" ""
         . Text.replace "’" ""
+        . Text.replace "\x306’i" "’i\x306" -- PL 239
         . Text.replace " -" "-"
         . Text.replace " ;" ";"
         . Text.replace " –" "–"
@@ -46,21 +57,10 @@ normalize =
         . Text.replace ">" ""
         . Text.replace "{" ""
         . Text.replace "}" ""
-        . Text.replace "\x306’i" "’i\x306" -- PL 239
-        . Text.normalize Text.NFD
-        . Text.toLower
-        . Text.replace "A., B, C." "A, Bė, Cė" -- PL 348
-        . Text.replace "n\x304" "nn" -- nn abbreviation with macron, e.g. PL 595
-        . Text.replace "å" "ă" -- PL 611
-        . Text.replace ": " "" -- WD 416
-        . Text.replace "„" "" -- PL 173
-        . Text.replace "„ " "" -- WD 416
-        . Text.replace "“" "" -- RG 241
-        . Text.replace "`I" "Ì" -- RG 2
 
 metaiLines :: IO [Line]
 metaiLines = do
-    csvData <- ByteString.readFile "metai.csv"
+    csvData <- ByteString.getContents
     case decodeByName csvData :: Either String (Header, Vector.Vector Line) of
         Left err -> error err
         Right (_header, v) ->
