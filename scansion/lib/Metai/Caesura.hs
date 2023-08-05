@@ -3,14 +3,13 @@
 module Metai.Caesura where
 
 import Data.List (intercalate)
-import qualified Data.Text as Text
 import Metai.Hexameter (Foot (..), footToPattern)
-import Metai.Parse (Line (..))
-import Metai.Syllable (Syllable, syllabify)
-import Metai.Token (tokenize)
+import Metai.Syllable (Syllable, hasPunctuation)
 
 data Caesura = Trithemimeres | Penthemimeres | KataTritonTrochaion | Hephthemimeres | PostQuartumTrochaeum | BucolicDiaeresis
-    deriving (Eq, Bounded, Enum)
+    deriving (Eq, Ord, Bounded, Enum)
+
+data CaesuraMarked = Unmarked | Marked deriving (Show)
 
 allCaesuras :: [Caesura]
 allCaesuras = [minBound .. maxBound]
@@ -40,20 +39,16 @@ listBoundaryAfter :: Int -> [[a]] -> Bool
 listBoundaryAfter nElements =
     elem 0 . scanl (\remainingSyllables word -> remainingSyllables - length word) nElements
 
-hasCaesura :: [Foot] -> [[Syllable]] -> Caesura -> Bool
+hasCaesura :: [Foot] -> [[Syllable]] -> Caesura -> Maybe CaesuraMarked
 hasCaesura scansion syllables caesura =
-    ((caesura /= KataTritonTrochaion) || (scansion !! 2 == Dactyl))
-        && ((caesura /= PostQuartumTrochaeum) || (scansion !! 3 == Dactyl))
-        && listBoundaryAfter (versePosition caesura scansion) syllables
-
-caesuras :: Maybe [[Foot]] -> Line -> Maybe [[Caesura]]
-caesuras analysis line =
-    map
-        ( \scansion ->
-            filter
-                (hasCaesura scansion syllables)
-                [Trithemimeres, Penthemimeres, KataTritonTrochaion, Hephthemimeres, PostQuartumTrochaeum, BucolicDiaeresis]
-        )
-        <$> analysis
+  if hasCaesura'
+     then if hasPunctuation (concat syllables !! (caesuraPosition - 1))
+             then Just Marked
+             else Just Unmarked
+     else Nothing
   where
-    syllables = map (syllabify . tokenize) $ Text.words $ lineText line
+    caesuraPosition = versePosition caesura scansion
+    hasCaesura' =
+      not ((caesura == KataTritonTrochaion) && (scansion !! 2 /= Dactyl))
+          && not ((caesura == PostQuartumTrochaeum) && (scansion !! 3 /= Dactyl))
+          && listBoundaryAfter caesuraPosition syllables

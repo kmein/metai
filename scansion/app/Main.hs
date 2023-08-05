@@ -14,7 +14,7 @@ import Data.Text (Text, pack)
 import qualified Data.Text as Text
 import Data.Text.Encoding
 import qualified Data.Vector as Vector
-import Metai.Caesura (allCaesuras, caesuras)
+import Metai.Caesura (allCaesuras, hasCaesura)
 import Metai.Hexameter (Foot (..), analyse, distance, footToPattern, metrePattern, stressPattern, weightPattern)
 import Metai.Parse (Line (..), metaiLines)
 import Metai.Syllable (syllabify)
@@ -48,24 +48,26 @@ main = do
                 ( \line@Line{..} ->
                     let lineWords = Text.words lineText
                         syllables = map (syllabify . tokenize) lineWords
-                        analysis = analyse line
-                        feet = map (concatMap footToPattern) <$> (analysis)
+                        analyses = analyse line
+                        feet = map (concatMap footToPattern) <$> analyses
+                        display :: (a -> String) -> Maybe [a] -> Text
                         display f = pack . maybe "NA" (intercalate "|" . map f)
                         weights = concatMap weightPattern syllables
                         metres = concatMap metrePattern syllables
                         stresses = concatMap stressPattern syllables
-                        lineCaesuras = caesuras analysis line
                      in [ ("book", pack $ show lineBook)
                         , ("verse", lineVerse)
                         , ("text", lineText)
                         , ("syllables", pack $ show $ length $ concat syllables)
                         , ("words", pack $ show $ length lineWords)
-                        , ("scansion", display (map renderFoot) analysis)
+                        , ("scansion", display (map renderFoot) analyses)
                         ]
-                            `Map.union` Map.fromList (map (\c -> (pack $ show c, display show (map (elem c) <$> lineCaesuras))) allCaesuras)
-                            `Map.union` [
-                                          -- , ("caesuras", display show $ caesuras analysis line)
-                                          ("metre", pack $ show metres)
+                            `Map.union` ( Map.fromList $
+                                            map
+                                                (\c -> (pack $ show c, display show $ map (\scansion -> hasCaesura scansion syllables c) <$> analyses))
+                                                allCaesuras
+                                        )
+                            `Map.union` [ ("metre", pack $ show metres)
                                         , ("metreConflict", display (show . distance metres) feet)
                                         , ("stress", pack $ show stresses)
                                         , ("stressConflict", display (show . distance stresses) feet)

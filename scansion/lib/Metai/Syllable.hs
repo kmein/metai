@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Metai.Syllable (Syllable, syllabify, segments, onset, rhyme, nucleus, coda, syllable) where
+module Metai.Syllable (Syllable, syllabify, segments, onset, rhyme, nucleus, coda, syllable, hasPunctuation) where
 
 import Data.Maybe (maybeToList)
 import Data.Void (Void)
@@ -26,6 +26,9 @@ onset = takeWhile (not . tokenIsVowel) . segments
 rhyme = dropWhile (not . tokenIsVowel) . segments
 nucleus = takeWhile tokenIsVowel . rhyme
 coda = dropWhile tokenIsVowel . rhyme
+
+hasPunctuation :: Syllable -> Bool
+hasPunctuation = (== Punctuation) . last . getSyllable
 
 -------------------------------------------------------------------------------
 -- Syllabification algorithm
