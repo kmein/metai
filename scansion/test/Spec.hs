@@ -27,10 +27,10 @@ syllabification =
             [ testCase "extrasyllabics" $ ["ʒvaig", "ʒdems"] @=? syllabify' "żwaigżdėms"
             , testCase "simple" $ ["sau", "le", "le"] @=? syllabify' "Sauléle"
             , testCase "geminate" $ ["bud", "di", "no"] @=? syllabify' "buddı̆nŏ"
-            , testCase "diphthong" $ ["ʤau", "ges"] @=? syllabify' "dʒ̇augės"
+            , testCase "diphthong" $ ["ʤau", "ges"] @=? syllabify' "dʒaugės"
             , testCase "ignore morphology :|" $ ["i", "ʃim", "ti"] @=? syllabify' "iſʒimtı̆"
-            , testCase "ignore morphology :(" $ ["pri", "siest"] @=? syllabify' "prı̆ſı̆ėſt'"
-            , testCase "enforce morphology :)" $ ["pri", "si", "est"] @=? syllabify' "prı̆ſı̆|ėſt'"
+            , testCase "ignore morphology :(" $ ["pri", "siest"] @=? syllabify' "prı̆ſı̆ėſt’"
+            , testCase "enforce morphology :)" $ ["pri", "si", "est"] @=? syllabify' "prı̆ſı̆|ėſt’"
             ]
 
 scansion :: TestTree

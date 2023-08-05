@@ -85,18 +85,18 @@ textToken =
                 many $
                     foldr1
                         (<|>)
-                        [ Ogonek <$ oneOf ['\x328', '\x31C', '\x337']
+                        [ Ogonek <$ oneOf ['\x328', '\x337']
                         , Acute <$ char '\x301'
                         , Dot <$ char '\x307'
-                        , Breve <$ oneOf ['\x306', '\x303']
+                        , Breve <$ oneOf ['\x306']
                         , Circumflex <$ char '\x302'
                         , Grave <$ char '\x300'
                         ]
             return $ Sound (Vowel diacritics) vowel
         , Sound Occlusive <$> (('ʤ' <$ string "dž") <|> ('ʦ' <$ char 'c') <|> ('ʧ' <$ char 'č') <|> oneOf ['p', 't', 'k', 'b', 'd', 'g'])
         , Sound Sibilant <$> (oneOf ['s', 'z'] <|> ('ʒ' <$ char 'ž') <|> ('ʃ' <$ char 'š'))
-        , Sound Resonant <$> (('n' <$ string "ň") <|> oneOf ['m', 'n', 'j', 'l', 'v'] <|> (char 'r' <* optional (char '\x302')))
-        , Punctuation <$ oneOf ("/()!,?.:;-|–" :: [Char])
+        , Sound Resonant <$> (oneOf ['m', 'n', 'j', 'l', 'v', 'r'])
+        , Punctuation <$ oneOf ("/!,?.:;–" :: [Char])
         , SyllableBreak <$ char '|'
         , Space <$ oneOf (" \n" :: [Char])
         ]

@@ -75,6 +75,8 @@
         (hoogleWithPackages (_: drv.propagatedBuildInputs))
         fourmolu
         pythonInstallation
+        pkg-config
+        icu
       ]);
     };
   };

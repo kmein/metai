@@ -5,6 +5,7 @@ module Metai.Parse where
 import qualified Data.ByteString.Lazy as ByteString
 import Data.Csv
 import qualified Data.Text as Text
+import qualified Data.Text.ICU.Replace as Regex
 import qualified Data.Text.Normalize as Text
 import qualified Data.Vector as Vector
 import Metai.Extra (debug)
@@ -23,40 +24,24 @@ normalize =
         . Text.replace "dz" "dž"
         . Text.replace "ż" "ž"
         . Text.replace "ź" "ž"
-        . Text.replace "ž" "ž"
         . Text.replace "cź" "č"
         . Text.replace "sź" "š"
-        . Text.replace "cż" "č"
         . Text.replace "ſ" "s"
         . Text.replace "ʒ" "z"
         . Text.replace "w" "v"
         . Text.replace "ů" "uo"
+        . Text.replace "å" "ă" -- PL 611
         . Text.replace "ë" "ie"
         . Text.replace "ı" "i"
         . Text.replace "n\x304" "nn" -- nn abbreviation with macron, e.g. PL 595
         . Text.normalize Text.NFD
         . Text.toLower
         . Text.replace "A., B, C." "A, Bė, Cė" -- PL 348
-        . Text.replace "å" "ă" -- PL 611
-        . Text.replace ": " "" -- WD 416
-        . Text.replace "„" "" -- PL 173
-        . Text.replace "„ " "" -- WD 416
-        . Text.replace "“" "" -- RG 241
-        . Text.replace "`I" "Ì" -- RG 2
-        . Text.replace "'" ""
+        . Text.replace "`I" "Ì" -- RG ŽR
         . Text.replace "’" ""
-        . Text.replace "\x306’i" "’i\x306" -- PL 239
-        . Text.replace " -" "-"
-        . Text.replace " ;" ";"
-        . Text.replace " –" "–"
-        . Text.replace " /" "/"
-        . Text.replace " |" "|"
-        . Text.replace "]" ""
-        . Text.replace "[" ""
-        . Text.replace "<" ""
-        . Text.replace ">" ""
-        . Text.replace "{" ""
-        . Text.replace "}" ""
+        . Text.replace "n\x306’i" "n’i\x306" -- PL 239
+        . Regex.replaceAll "\\s(;|/|\\[|]|\\||–)" ","
+        . Regex.replaceAll "(^: |[<>{}„“])" ""
 
 metaiLines :: IO [Line]
 metaiLines = do

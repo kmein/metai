@@ -57,12 +57,10 @@ syllable = do
     onsetOcclusive <- optional occlusive
     onsetSibilant <- optional sibilant -- 1.423 kàd wiſſ miegôt'
     _ <- optional (satisfy (== SyllableBreak))
-    beforePunctuation <- many $ satisfy (== Punctuation)
     return $
         Syllable $
             concat
-                [ beforePunctuation
-                , maybeToList onsetSibilant
+                [ maybeToList onsetSibilant
                 , maybeToList onsetOcclusive
                 , maybeToList onsetResonant
                 , maybeToList onglide
