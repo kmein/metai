@@ -61,7 +61,7 @@
         ${pkgs.gnused}/bin/sed -i '/endhead/,/endfoot/{//!d}' assets/table-*.tex
 
         mkdir -p $out
-        cp assets/*{html,svg,tex,pdf} $out/
+        cp assets/*{md,html,svg,tex,pdf} $out/
       '';
       metai = pkgs.haskellPackages.callCabal2nix "metai" ./scansion {};
       inherit metaiXML;
