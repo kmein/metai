@@ -6,7 +6,7 @@
   outputs = { self, nixpkgs }:
   let
     system = "x86_64-linux";
-    pkgs = import nixpkgs { inherit system; };
+    pkgs = nixpkgs.legacyPackages.${system};
     lib = nixpkgs.lib;
     fetchMetai = name: hash: pkgs.fetchurl {
       url = "https://titus.fkidg1.uni-frankfurt.de/cordon/data/tei/${name}.tei.xml";
