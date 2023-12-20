@@ -26,8 +26,8 @@ main = do
             Dactyl -> 'D'
             Spondee -> 'S'
     allLines <- metaiLines
-    ByteString.putStr $
-        encodeByName
+    ByteString.putStr
+        $ encodeByName
             ( [ "book"
               , "verse"
               , "text"
@@ -44,36 +44,36 @@ main = do
                    , "weightConflict"
                    ]
             )
-            $ map
-                ( \line@Line{..} ->
-                    let lineWords = Text.words lineText
-                        syllables = map (syllabify . tokenize) lineWords
-                        analyses = analyse line
-                        feet = map (concatMap footToPattern) <$> analyses
-                        display :: (a -> String) -> Maybe [a] -> Text
-                        display f = pack . maybe "NA" (intercalate "|" . map f)
-                        weights = concatMap weightPattern syllables
-                        metres = concatMap metrePattern syllables
-                        stresses = concatMap stressPattern syllables
-                     in [ ("book", pack $ show lineBook)
-                        , ("verse", lineVerse)
-                        , ("text", lineText)
-                        , ("syllables", pack $ show $ length $ concat syllables)
-                        , ("words", pack $ show $ length lineWords)
-                        , ("scansion", display (map renderFoot) analyses)
-                        ]
-                            `Map.union` ( Map.fromList $
-                                            map
-                                                (\c -> (pack $ show c, display show $ map (\scansion -> hasCaesura scansion syllables c) <$> analyses))
-                                                allCaesuras
-                                        )
-                            `Map.union` [ ("metre", pack $ show metres)
-                                        , ("metreConflict", display (show . distance metres) feet)
-                                        , ("stress", pack $ show stresses)
-                                        , ("stressConflict", display (show . distance stresses) feet)
-                                        , ("weight", pack $ show weights)
-                                        , ("weightConflict", display (show . distance weights) feet)
-                                        ] ::
-                            Map Text Text
-                )
-                allLines
+        $ map
+            ( \line@Line{..} ->
+                let lineWords = Text.words lineText
+                    syllables = map (syllabify . tokenize) lineWords
+                    analyses = analyse line
+                    feet = map (concatMap footToPattern) <$> analyses
+                    display :: (a -> String) -> Maybe [a] -> Text
+                    display f = pack . maybe "NA" (intercalate "|" . map f)
+                    weights = concatMap weightPattern syllables
+                    metres = concatMap metrePattern syllables
+                    stresses = concatMap stressPattern syllables
+                 in [ ("book", pack $ show lineBook)
+                    , ("verse", lineVerse)
+                    , ("text", lineText)
+                    , ("syllables", pack $ show $ length $ concat syllables)
+                    , ("words", pack $ show $ length lineWords)
+                    , ("scansion", display (map renderFoot) analyses)
+                    ]
+                        `Map.union` ( Map.fromList $
+                                        map
+                                            (\c -> (pack $ show c, display show $ map (\scansion -> hasCaesura scansion syllables c) <$> analyses))
+                                            allCaesuras
+                                    )
+                        `Map.union` [ ("metre", pack $ show metres)
+                                    , ("metreConflict", display (show . distance metres) feet)
+                                    , ("stress", pack $ show stresses)
+                                    , ("stressConflict", display (show . distance stresses) feet)
+                                    , ("weight", pack $ show weights)
+                                    , ("weightConflict", display (show . distance weights) feet)
+                                    ] ::
+                        Map Text Text
+            )
+            allLines
