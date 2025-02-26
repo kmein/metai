@@ -21,9 +21,9 @@
       p.papermill
     ]);
     metaiXML = {
-      PL = fetchMetai "DM_PL_1765_1775" "sha256-FndcJyPWDDwPWlULEI8/tl7feGk2BG1y+G+RZOQL+Rg=";
-      WD = fetchMetai "DM_WD_1765_1775" "sha256-FOZhOKP7wPiLtQ5oUtBlGjOzhLwMsVwwaOh4v9Vw0Cs=";
-      RG = fetchMetai "DMN_RG_1869" "sha256-qEEd082d32SWOXz5c8sFaY++5vXKb7GCWFvTZIJvErk=";
+      PL = fetchMetai "DM_PL_1765_1775" "sha256-Fx4dZ+FQYegHRqX5jAc7b+GPCB0Sh7aLt6ZpDeayRsw=";
+      WD = fetchMetai "DM_WD_1765_1775" "sha256-G4TzWZbZ3V1/xHqCsEBoHgFrLP+GA+KYaljpJBD6NxA=";
+      RG = fetchMetai "DMN_RG_1869" "sha256-359tbpddJh6Us1mj6JcJgtwqhy+DcZt+nQ0xRF81ZMg=";
       ZR = fetchMetai "DMN_ZR_1869" "sha256-whh3/BPMmhpCxvIU9R/nKknsw6+1VKNph4uPn+PCnD8=";
     };
   in {
