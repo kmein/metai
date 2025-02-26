@@ -45,8 +45,19 @@
           flakeIgnore = ["E501"];
         } (builtins.readFile ./extract_cordon.py)} ${toString (map lib.escapeShellArg (builtins.attrValues metaiXML))} > $out
       '';
+      insert-cordon = pkgs.writers.writePython3Bin "insert-cordon" {
+        libraries = [pkgs.python3Packages.pandas pkgs.python3Packages.numpy];
+        flakeIgnore = ["E501" "W503"];
+      } (builtins.readFile ./insert_cordon.py);
       metai-scansion-csv = pkgs.runCommand "metai-scansion.csv" {} ''
         cat ${metai-csv} | ${self.packages.${system}.metai}/bin/metai > $out
+      '';
+      metai-scanned-tei = pkgs.runCommand "metai-scanned" {} ''
+        mkdir $out
+        ${insert-cordon}/bin/insert-cordon ${metai-scansion-csv} < ${metaiXML.PL} > $out/PL_scanned.xml
+        ${insert-cordon}/bin/insert-cordon ${metai-scansion-csv} < ${metaiXML.WD} > $out/WD_scanned.xml
+        ${insert-cordon}/bin/insert-cordon ${metai-scansion-csv} < ${metaiXML.RG} > $out/RG_scanned.xml
+        ${insert-cordon}/bin/insert-cordon ${metai-scansion-csv} < ${metaiXML.ZR} > $out/ZR_scanned.xml
       '';
       metai-assets = pkgs.runCommand "assets" {} ''
         PATH=$PATH:${nixpkgs.lib.makeBinPath [pythonInstallation]} \

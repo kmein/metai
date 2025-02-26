@@ -45,7 +45,7 @@ def annotate_syllable_boundaries(text: str) -> str:
 
 
 if __name__ == "__main__":
-    donelaitis_writer = csv.DictWriter(sys.stdout, fieldnames=["Book", "Line", "Text"])
+    donelaitis_writer = csv.DictWriter(sys.stdout, fieldnames=["ID", "Book", "Line", "Text"])
     donelaitis_writer.writeheader()
     for path in sys.argv[1:]:
         with open(path, "r") as book_file:
@@ -55,8 +55,10 @@ if __name__ == "__main__":
                 try:
                     if text in ["Ganà.", "ganà."]:
                         continue
-                    book_id, page, page_line, line = re.sub(pattern='####nuo čia: .*', repl='', string=xml_id).split("_")
+                    xml_id = re.sub(pattern='####nuo čia: .*', repl='', string=xml_id)
+                    book_id, page, page_line, line = xml_id.split("_")
                     donelaitis_writer.writerow({
+                        "ID": xml_id,
                         "Book": books.index(book_id) + 1,
                         "Line": line,
                         "Text": annotate_syllable_boundaries(text),

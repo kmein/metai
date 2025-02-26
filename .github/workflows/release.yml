@@ -18,6 +18,8 @@ jobs:
       - name: assets
         run: nix build $GITHUB_WORKSPACE#metai-assets --out-link assets
       - run: zip assets.zip assets/*
+      - name: scanned TEI
+        run: nix build $GITHUB_WORKSPACE#metai-scanned-tei --out-link scanned-tei
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -27,3 +29,4 @@ jobs:
           files: |
             *.csv
             assets.zip
+            scanned-tei/*.xml

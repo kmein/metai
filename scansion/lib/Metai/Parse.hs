@@ -11,11 +11,11 @@ import qualified Data.Vector as Vector
 import Metai.Extra (debug)
 import Numeric.Natural (Natural)
 
-data Line = Line {lineBook :: Natural, lineVerse :: Text.Text, lineText :: Text.Text}
+data Line = Line {lineId :: Text.Text, lineBook :: Natural, lineVerse :: Text.Text, lineText :: Text.Text}
     deriving (Show)
 
 instance FromNamedRecord Line where
-    parseNamedRecord l = Line <$> (l .: "Book") <*> (l .: "Line") <*> (normalize <$> l .: "Text")
+    parseNamedRecord l = Line <$> (l .: "ID") <*> (l .: "Book") <*> (l .: "Line") <*> (normalize <$> l .: "Text")
 
 normalize :: Text.Text -> Text.Text
 normalize =

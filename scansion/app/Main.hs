@@ -28,10 +28,12 @@ main = do
     allLines <- metaiLines
     ByteString.putStr
         $ encodeByName
-            ( [ "book"
+            ( [ "id"
+              , "book"
               , "verse"
               , "text"
               , "words"
+              , "wordSyllables"
               , "syllables"
               , "scansion"
               ]
@@ -55,11 +57,13 @@ main = do
                     weights = concatMap weightPattern syllables
                     metres = concatMap metrePattern syllables
                     stresses = concatMap stressPattern syllables
-                 in [ ("book", pack $ show lineBook)
+                 in [ ("id", lineId)
+                    , ("book", pack $ show lineBook)
                     , ("verse", lineVerse)
                     , ("text", lineText)
                     , ("syllables", pack $ show $ length $ concat syllables)
                     , ("words", pack $ show $ length lineWords)
+                    , ("wordSyllables", pack $ intercalate "." $ map (show . length) syllables)
                     , ("scansion", display (map renderFoot) analyses)
                     ]
                         `Map.union` ( Map.fromList $
